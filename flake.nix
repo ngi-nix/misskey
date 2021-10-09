@@ -28,10 +28,6 @@
 
           buildInputs = [ elasticsearch-oss ffmpeg ];
 
-          buildPhase = ''
-            yarn
-          '';
-
           meta = {
             description = "An interplanetary communication platform";
             homepage = "https://misskey.io";
@@ -47,6 +43,13 @@
       defaultPackage = forAllSystems (system:
         self.packages.${system}.misskey);
 
-      devShell = self.defaultPackage;
+      devShell = forAllSystems (system:
+        let
+          pkgs = nixpkgsFor."${system}";
+        in
+        pkgs.mkShell {
+          # TODO: add python3 and libc.dev
+          buildInputs = with pkgs; [ yarn2nix yarn nodejs gcc libtool nasm pkgconfig zlib.dev git ];
+        });
     };
 }
