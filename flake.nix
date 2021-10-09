@@ -16,25 +16,61 @@
         });
     in
     {
-      overlay = final: prev: with prev; {
-        misskey = mkYarnPackage {
-          pname = "misskey";
-          version = "12.91.0";
+      overlay = final: prev: with prev;
+        let
+          nodeModules = mkYarnModules {
+            pname = "misskey-node_modules";
+            version = "12.91.0";
+            packageJSON = ./package.json;
+            yarnLock = ./yarn.lock;
+          };
+        in
+        {
+          misskey = stdenv.mkDerivation {
+            pname = "misskey";
+            version = "12.91.0";
 
-          src = ./.;
+            src = ./.;
 
-          packageJSON = ./package.json;
-          yarnLock = ./yarn.lock;
+            buildInputs = [ yarn nodejs ];
+            nativeBuildInputs = [ makeWrapper ];
 
-          buildInputs = [ elasticsearch-oss ffmpeg ];
+            configurePhase = ''
+              mkdir node_modules
+              for dep in ${nodeModules}/node_modules/* ${nodeModules}/deps/misskey-node_modules/node_modules/*; do
+                basename=$(basename $dep)
+                if [[ ! -d node_modules/$basename ]]; then
+                  cp -R $dep node_modules/
+                fi
+              done
+              chmod -R 755 node_modules/three/examples/fonts
+              export PATH="${nodeModules}/deps/misskey-node_modules/node_modules/.bin:$PATH"
+            '';
 
-          meta = {
-            description = "An interplanetary communication platform";
-            homepage = "https://misskey.io";
-            license = lib.licenses.agpl3Plus;
+            buildPhase = ''
+              npm run build
+            '';
+
+            installPhase =
+              let
+                misskey-bin = writeScript "misskey" ''
+                '';
+              in
+              ''
+                mkdir -p $out/bin
+                cp -R * $out/
+                makeWrapper "${nodejs}/bin/node" "$out/bin/misskey" \
+                  --add-flags "--experimental-json-modules" \
+                  --add-flags "$out/index.js"
+              '';
+
+            meta = {
+              description = "An interplanetary communication platform";
+              homepage = "https://misskey.io";
+              license = lib.licenses.agpl3Plus;
+            };
           };
         };
-      };
 
       packages = forAllSystems (system: {
         inherit (nixpkgsFor.${system}) misskey;
