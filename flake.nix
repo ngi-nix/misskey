@@ -54,9 +54,10 @@
             installPhase = ''
               mkdir -p $out/bin
               cp -R * $out/
+              cp -R .config $out/
               makeWrapper "${nodejs}/bin/node" "$out/bin/misskey" \
                 --add-flags "--experimental-json-modules" \
-                --add-flags "$out/index.js"
+                --add-flags "$out/built/index.js"
             '';
 
             meta = {
