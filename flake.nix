@@ -51,18 +51,13 @@
               npm run build
             '';
 
-            installPhase =
-              let
-                misskey-bin = writeScript "misskey" ''
-                '';
-              in
-              ''
-                mkdir -p $out/bin
-                cp -R * $out/
-                makeWrapper "${nodejs}/bin/node" "$out/bin/misskey" \
-                  --add-flags "--experimental-json-modules" \
-                  --add-flags "$out/index.js"
-              '';
+            installPhase = ''
+              mkdir -p $out/bin
+              cp -R * $out/
+              makeWrapper "${nodejs}/bin/node" "$out/bin/misskey" \
+                --add-flags "--experimental-json-modules" \
+                --add-flags "$out/index.js"
+            '';
 
             meta = {
               description = "An interplanetary communication platform";
