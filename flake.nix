@@ -97,7 +97,7 @@
             # and applies the user defined misskey config to it. This means
             # that no matter what package the user provides, it will be processed
             # and contain the default.yml (config file) in its output.
-            finalPackage = pkgs.runCommandNoCC "misskey-with-config" { } ''
+            finalPackage = pkgs.runCommand "misskey-with-config" { } ''
               cp -rs ${cfg.package} $out
               chmod +w -R $out
               ln -sf ${configFile} $out/.config/default.yml
@@ -133,7 +133,7 @@
               };
 
               package = mkOption {
-                type = types.pkg;
+                type = types.package;
                 default = pkgs.misskey;
                 description = ''
                   Package for Misskey.
