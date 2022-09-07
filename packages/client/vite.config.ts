@@ -2,15 +2,15 @@ import * as fs from 'fs';
 import pluginVue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 
-import locales from '../../locales';
-import meta from '../../package.json';
+import locales from './misskey_root/locales';
+import meta from './misskey_root/package.json';
 import pluginJson5 from './vite.json5';
 
 const extensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json', '.json5', '.svg', '.sass', '.scss', '.css', '.vue'];
 
 export default defineConfig(({ command, mode }) => {
-	fs.mkdirSync(__dirname + '/../../built', { recursive: true });
-	fs.writeFileSync(__dirname + '/../../built/meta.json', JSON.stringify({ version: meta.version }), 'utf-8');
+	// fs.mkdirSync(__dirname + '/../../built', { recursive: true });
+	// fs.writeFileSync(__dirname + '/../../built/meta.json', JSON.stringify({ version: meta.version }), 'utf-8');
 
 	return {
 		base: '/assets/',
@@ -63,7 +63,7 @@ export default defineConfig(({ command, mode }) => {
 				},
 			},
 			cssCodeSplit: true,
-			outDir: __dirname + '/../../built/_client_dist_',
+			outDir: process.env.client,
 			assetsDir: '.',
 			emptyOutDir: false,
 			sourcemap: process.env.NODE_ENV !== 'production',
